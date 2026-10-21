@@ -1,5 +1,6 @@
 import streamlit as st
 from search import load_data, build_vocab, search
+from gemma import read_label
 
 st.set_page_config(page_title="MedLens", page_icon="💊")
 
@@ -13,8 +14,28 @@ df, vocab = get_data()
 st.title("💊 MedLens")
 st.caption("Find the Jan Aushadhi generic price for a medicine.")
 
+photo = st.file_uploader("📷 Or upload a photo of the medicine strip or box",
+                         type=["jpg", "jpeg", "png"])
+if photo is not None:
+    photo_id = f"{photo.name}-{photo.size}"
+    if st.session_state.get("last_photo") != photo_id:
+        with st.spinner("Gemma is reading the label..."):
+            try:
+                read = read_label(photo.getvalue(), photo.type)
+            except Exception as e:
+                read = ""
+                st.error("Could not read the photo. You can type the name instead.")
+                st.caption(f"Technical detail: {e}")
+        st.session_state["last_photo"] = photo_id
+        if read:
+            st.session_state["q"] = read
+        else:
+            st.warning("No medicine name could be read from this photo. Please type it below.")
+    st.image(photo, width=240)
+
 query = st.text_input("Medicine name (spelling mistakes are okay)",
-                      placeholder="e.g. paracetmol 500")
+                      placeholder="e.g. paracetmol 500", key="q")
+st.caption("If you used a photo, check the name above. The AI can misread blurry photos.")
 paid = st.number_input("Price you were charged for the same pack, ₹ (optional)",
                        min_value=0.0, step=1.0, value=0.0)
 
