@@ -1,7 +1,7 @@
 import streamlit as st
 from search import load_data, build_vocab, search
 
-st.set_page_config(page_title="RxLens", page_icon="💊")
+st.set_page_config(page_title="MedLens", page_icon="💊")
 
 @st.cache_data
 def get_data():
@@ -10,7 +10,7 @@ def get_data():
 
 df, vocab = get_data()
 
-st.title("💊 RxLens")
+st.title("💊 MedLens")
 st.caption("Find the Jan Aushadhi generic price for a medicine.")
 
 query = st.text_input("Medicine name (spelling mistakes are okay)",
@@ -45,5 +45,5 @@ if query:
                    "Compare with the same pack size.")
 
 st.divider()
-st.info("RxLens shows price and medicine-name information only. It is not medical advice. "
+st.info("MedLens shows price and medicine-name information only. It is not medical advice. "
         "Never switch medicines without confirming with your doctor or pharmacist.")
